@@ -56,7 +56,7 @@ ROOT_URLCONF = 'banking.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': ["templates"],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -127,3 +127,6 @@ REST_FRAMEWORK = {
 
     )
 }
+
+STATIC_URL = '/static/'
+LOGIN_REDIRECT_URL = '/transactions/'

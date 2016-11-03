@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>List of Transactions</h1>
+{% for transaction in object_list %}
+<div class="panel panel-default">
+  <div class="panel-body">
+    date of transaction : {{transaction.time_created}}
+    Amount: ${{transaction.amount}}
+  </div>
+</div>
+
+
+{% endfor %}
+
+
+
+
+
+{% endblock %}
