@@ -31,7 +31,9 @@ class TransactionCreateView(CreateView):
 
     def form_valid(self, form):
         instance = form.save(commit=False)
-        instance.created_user = self.request.user
+        instance.account = self.request.user
+        if instance.amount == 0:
+            return None
         return super().form_valid(form)
 
 class UserCreateView(CreateView):

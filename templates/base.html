@@ -16,12 +16,12 @@
       <div class="container">
 
       <ul class="nav nav-pills">
-          <li role="presentation"><a href="{% url 'index_view' %}">Home</a></li>
+
           {% if not request.user.is_authenticated %}
             <li role="presentation"><a href="{% url 'user_create_view' %}">Create User</a></li>
             <li role="presentation"><a href="{% url 'login' %}">Login</a></li>
           {% else %}
-
+          
             <li role="presentation"><a href="{% url 'logout' %}?next={% url 'transaction_list_view' %}">Logout</a></li>
           {% endif %}
         </ul>
