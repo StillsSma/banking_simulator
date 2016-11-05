@@ -129,4 +129,4 @@ REST_FRAMEWORK = {
 }
 
 STATIC_URL = '/static/'
-LOGIN_REDIRECT_URL = '/transactions/'
+LOGIN_REDIRECT_URL = '/'

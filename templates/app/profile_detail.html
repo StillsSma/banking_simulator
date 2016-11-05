@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+  <h1>List of Transactions</h1>
+  <a href="{% url 'transaction_create_view' profile.id %}">Create Transaction</a>
+</div>
+<div class="container">
+  <h3>Balance: {{object.balance}} </h3>
+</div>
+{% for transaction in object.transactions %}
+<div class="panel panel-default">
+  <div class="panel-body">
+    Date of transaction : {{transaction.time_created}}
+    Amount: {{ transaction.amount }}
+  </div>
+</div>
+
+{% endfor %}
+
+
+
+
+{% endblock %}
