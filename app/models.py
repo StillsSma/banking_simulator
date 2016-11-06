@@ -2,10 +2,11 @@ from django.db import models
 from django.dispatch import receiver
 from django.db.models import Sum
 from django.db.models.signals import post_save
-
+import random
 
 class Profile(models.Model):
     user = models.OneToOneField('auth.User')
+    account_number = models.CharField(max_length=4, unique=True)
 
     def __str__(self):
         return str(self.id)
@@ -15,7 +16,9 @@ class Profile(models.Model):
         instance = kwargs["instance"]
         created = kwargs["created"]
         if created:
-            Profile.objects.create(user=instance)
+            r = random.randint(1111,9999)
+            Profile.objects.create(user=instance, account_number=r)
+
     def transactions(self):
         return Transaction.objects.filter(account=self)
 
@@ -31,5 +34,5 @@ class Transaction(models.Model):
     account = models.ForeignKey(Profile)
 
     @property
-    def is_credit(self):
+    def is_deposit(self):
         return self.amount > 0

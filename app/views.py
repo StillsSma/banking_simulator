@@ -10,34 +10,34 @@ from app.models import Transaction, Profile
 from app.serializers import TransactionSerializer
 from django.core.exceptions import PermissionDenied
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import get_object_or_404
 
 
 #from menu_api.permissions import
 
-class IndexView(TemplateView):
-
+class IndexView(LoginRequiredMixin, TemplateView):
+    login_url = '/login/'
     template_name = "index.html"
 
     def get_context_data(self, **kwargs):
         context = super(IndexView, self).get_context_data(**kwargs)
-        try:
-            context['profile'] = Profile.objects.get(user=self.request.user)
-        except TypeError:
-            pass
+
+        context['profile'] = get_object_or_404(Profile, user=self.request.user)
+
         return context
+
+
+
 
 class ProfileView(LoginRequiredMixin, DetailView):
     model = Profile
-    login_url = '/login/'
 
     def get_context_data(self, **kwargs):
         context = super(ProfileView, self).get_context_data(**kwargs)
         context['profile'] = Profile.objects.get(user=self.request.user)
         if self.kwargs['pk'] != str(self.request.user.profile):
             raise PermissionDenied
-
-
-
         return context
 
 class TransactionCreateView(LoginRequiredMixin, CreateView):
@@ -50,17 +50,23 @@ class TransactionCreateView(LoginRequiredMixin, CreateView):
         return reverse_lazy("profile_view", args=[var.id])
 
 
+
     def form_valid(self, form):
         instance = form.save(commit=False)
         instance.account = Profile.objects.get(user=self.request.user)
-        if instance.amount == 0 or Profile.objects.get(user=self.request.user).balance() + instance.amount < 0 :
-            return self.form_invalid(form)
+        try:
+            if instance.amount == 0 or Profile.objects.get(user=self.request.user).balance() + instance.amount < 0 :
+                return self.form_invalid(form)
+        except TypeError:
+            return super().form_valid(form)
         return super().form_valid(form)
 
 class UserCreateView(CreateView):
     model = User
     success_url = reverse_lazy("index_view")
     form_class = UserCreationForm
+
+
 
 
 
