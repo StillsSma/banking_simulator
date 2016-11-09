@@ -12,6 +12,7 @@ from django.core.exceptions import PermissionDenied
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404
+from app.permissions import IsCreatedByOrReadOnly
 
 
 #from menu_api.permissions import
@@ -48,9 +49,6 @@ class TransactionCreateView(LoginRequiredMixin, CreateView):
     def get_success_url(self,**kwargs):
         var = Profile.objects.get(user=self.request.user)
         return reverse_lazy("profile_view", args=[var.id])
-
-
-
     def form_valid(self, form):
         instance = form.save(commit=False)
         instance.account = Profile.objects.get(user=self.request.user)
@@ -61,15 +59,15 @@ class TransactionCreateView(LoginRequiredMixin, CreateView):
             return super().form_valid(form)
         return super().form_valid(form)
 
+
+
 class UserCreateView(CreateView):
     model = User
     success_url = reverse_lazy("index_view")
     form_class = UserCreationForm
 
 
-
-
-
-class TransactionListCreateAPIView(ListCreateAPIView):
+class TransactionCreateAPIView(ListCreateAPIView):
     queryset = Transaction.objects.all()
     serializer_class = TransactionSerializer
+    permission_classes = (IsCreatedByOrReadOnly, )

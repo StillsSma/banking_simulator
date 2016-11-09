@@ -6,5 +6,10 @@
   <h1>Welcome to this bank</h1>
 </div>
 
+  <ul class="nav nav-pills">
+  <div class="container">
+    <h2><a href="{% url 'profile_view' profile.id %}">{{user}} Profile</a></h2>
+  </div>
+</nav>
 
 {% endblock %}

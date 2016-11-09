@@ -3,7 +3,8 @@
 {% block content %}
 <div class="container">
   <h1>List of Transactions</h1>
-  <a href="{% url 'transaction_create_view' profile.id %}">Create Transaction</a>
+  <li role="presentation"><a href="{% url 'transaction_create_view' profile.id %}">Create Transaction</a></li>
+
 </div>
 <div class="container">
   <h3>Balance: {{object.balance}} </h3>
@@ -14,8 +15,8 @@
 {% for transaction in object.transactions %}
 <div class="panel panel-default">
   <div class="panel-body">
-    Date of transaction : {{transaction.time_created}}
-    Amount: {{ transaction.amount }}
+    <li role="presentation">Date of transaction : {{transaction.time_created}}</li>
+    <li role="presentation">Amount: {{ transaction.amount }}</li>
   </div>
 </div>
 
