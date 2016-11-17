@@ -1,11 +1,14 @@
 from rest_framework import permissions
 
-class IsCreatedByOrReadOnly(permissions.BasePermission):
+class IsCreatedBy(permissions.BasePermission):
 
     def has_object_permission(self, request, view, obj):
-        if request.method in permissions.SAFE_METHODS:
-            return True
-        print(obj.created_by == request.user)
-        print(request.user)
-        print(obj.created_by)
-        return obj.created_by == request.user
+        print(obj.account)
+        print(request.user.profile)
+        return obj.account == request.user.profile
+
+class Post(permissions.BasePermission):
+
+    def has_object_permission(self, request, view, obj):
+        print(23)
+        print(request)

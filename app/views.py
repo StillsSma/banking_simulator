@@ -4,15 +4,16 @@ from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Sum
-from rest_framework.generics import ListAPIView, RetrieveAPIView, ListCreateAPIView, RetrieveUpdateDestroyAPIView
+from rest_framework.generics import ListAPIView, RetrieveAPIView, ListCreateAPIView
 from django.views.generic import TemplateView, ListView, CreateView, DetailView
 from app.models import Transaction, Profile
-from app.serializers import TransactionSerializer
+from app.serializers import TransactionSerializer, ProfileSerializer
 from django.core.exceptions import PermissionDenied
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404
-from app.permissions import IsCreatedByOrReadOnly
+from rest_framework.permissions import IsAuthenticated
+from app.permissions import IsCreatedBy, Post
 
 
 #from menu_api.permissions import
@@ -44,7 +45,7 @@ class ProfileView(LoginRequiredMixin, DetailView):
 class TransactionCreateView(LoginRequiredMixin, CreateView):
     model = Transaction
     login_url = '/login/'
-    fields = ('amount',)
+    fields = ('amount', 'withdrawl_or_deposit')
 
     def get_success_url(self,**kwargs):
         var = Profile.objects.get(user=self.request.user)
@@ -53,8 +54,9 @@ class TransactionCreateView(LoginRequiredMixin, CreateView):
         instance = form.save(commit=False)
         instance.account = Profile.objects.get(user=self.request.user)
         try:
-            if instance.amount == 0 or Profile.objects.get(user=self.request.user).balance() + instance.amount < 0 :
-                return self.form_invalid(form)
+            if instance.withdrawl_or_deposit == "Debit":
+                if Profile.objects.get(user=self.request.user).balance() - instance.amount < 0 :
+                    return self.form_invalid(form)
         except TypeError:
             return super().form_valid(form)
         return super().form_valid(form)
@@ -67,7 +69,13 @@ class UserCreateView(CreateView):
     form_class = UserCreationForm
 
 
-class TransactionCreateAPIView(ListCreateAPIView):
+class TransactionListCreateAPIView(ListCreateAPIView):
+    def get_queryset(self):
+        return Transaction.objects.filter(account=self.request.user.profile)
+    serializer_class = TransactionSerializer
+    permission_classes = (IsAuthenticated,)
+
+class TransactionRetrieveAPIView(RetrieveAPIView):
     queryset = Transaction.objects.all()
     serializer_class = TransactionSerializer
-    permission_classes = (IsCreatedByOrReadOnly, )
+    permission_classes = (IsCreatedBy, )
