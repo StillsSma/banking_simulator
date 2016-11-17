@@ -3,6 +3,7 @@ from django.dispatch import receiver
 from django.db.models import Sum
 from django.db.models.signals import post_save
 from django.conf import settings
+from rest_framework.authtoken.models import Token
 
 import random
 
@@ -29,12 +30,13 @@ class Profile(models.Model):
         return Transaction.objects.filter(account=self).order_by('-time_created')
 
     def balance(self):
-        try:
-            credits =Transaction.objects.filter(account=self, withdrawl_or_deposit='Credit').aggregate(balance=Sum('amount'))['balance']
-            debits = Transaction.objects.filter(account=self, withdrawl_or_deposit='Debit').aggregate(balance=Sum('amount'))['balance']
-            return round( (credits - debits), 2)
-        except TypeError:
-            return None
+        credits = Transaction.objects.filter(account=self, withdrawl_or_deposit='Credit')
+        credit_total = sum([item.amount for item in credits])
+        debits = Transaction.objects.filter(account=self, withdrawl_or_deposit='Debit')
+        debit_total = sum([item.amount for item in debits])
+        return round( (credit_total - debit_total), 2)
+
+
 
 deposit = 'Credit'
 withdrawl = 'Debit'

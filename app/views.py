@@ -53,12 +53,10 @@ class TransactionCreateView(LoginRequiredMixin, CreateView):
     def form_valid(self, form):
         instance = form.save(commit=False)
         instance.account = Profile.objects.get(user=self.request.user)
-        try:
-            if instance.withdrawl_or_deposit == "Debit":
-                if Profile.objects.get(user=self.request.user).balance() - instance.amount < 0 :
-                    return self.form_invalid(form)
-        except TypeError:
-            return super().form_valid(form)
+        if instance.withdrawl_or_deposit == "Debit":
+            if Profile.objects.get(user=self.request.user).balance() - instance.amount < 0 :
+                return self.form_invalid(form)
+
         return super().form_valid(form)
 
 
